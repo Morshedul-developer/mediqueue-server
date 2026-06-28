@@ -71,6 +71,45 @@ async function run() {
       res.send(result);
     });
 
+    app.patch("/myAddedTutors/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedTutor = req.body;
+
+      const tutor = await myTutorsCollection.findOne({
+        _id: new ObjectId(id),
+      });
+
+      const updateDoc = {
+        $set: updatedTutor,
+      };
+
+      const myTutorResult = await myTutorsCollection.updateOne(
+        { _id: new ObjectId(id) },
+        updateDoc,
+      );
+
+      const query = {
+        email: tutor.email,
+        tutorName: tutor.tutorName,
+      };
+
+      await tutorsCollection.updateOne(query, updateDoc);
+
+      res.send(myTutorResult);
+    });
+
+    app.delete("/myAddedTutors/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const query = {
+        _id: new ObjectId(id),
+      };
+
+      const result = await myTutorsCollection.deleteOne(query);
+
+      res.send(result);
+    });
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
