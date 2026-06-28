@@ -63,6 +63,16 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/myBookedSessions", async (req, res) => {
+      const email = req.query.email;
+
+      const result = await bookedSessionsCollection
+        .find({ studentEmail: email })
+        .toArray();
+
+      res.send(result);
+    });
+
     app.post("/addMyTutor", async (req, res) => {
       const myTutor = req.body;
 
@@ -103,6 +113,21 @@ async function run() {
       await tutorsCollection.updateOne(query, updateDoc);
 
       res.send(myTutorResult);
+    });
+
+    app.patch("/myBookedSessions/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const result = await bookedSessionsCollection.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            status: "cancelled",
+          },
+        },
+      );
+
+      res.send(result);
     });
 
     app.delete("/myAddedTutors/:id", async (req, res) => {
