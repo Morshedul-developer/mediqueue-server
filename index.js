@@ -30,6 +30,7 @@ async function run() {
     const db = client.db("mediqueue");
     const tutorsCollection = db.collection("tutorsCollection");
     const myTutorsCollection = db.collection("myTutorCollection");
+    const bookedSessionsCollection = db.collection("bookedSessionsCollection");
 
     app.get("/tutors", async (req, res) => {
       const cursor = tutorsCollection.find();
@@ -68,6 +69,12 @@ async function run() {
       await myTutorsCollection.insertOne(myTutor);
       const result = await tutorsCollection.insertOne(myTutor);
 
+      res.send(result);
+    });
+
+    app.post("/bookSession", async (req, res) => {
+      const booking = req.body;
+      const result = await bookedSessionsCollection.insertOne(booking);
       res.send(result);
     });
 
