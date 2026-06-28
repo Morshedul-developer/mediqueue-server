@@ -84,8 +84,19 @@ async function run() {
 
     app.post("/bookSession", async (req, res) => {
       const booking = req.body;
-      const result = await bookedSessionsCollection.insertOne(booking);
-      res.send(result);
+
+      const bookingResult = await bookedSessionsCollection.insertOne(booking);
+
+      await tutorsCollection.updateOne(
+        { _id: new ObjectId(booking.tutorId) },
+        {
+          $inc: {
+            totalSlot: -1,
+          },
+        },
+      );
+
+      res.send(bookingResult);
     });
 
     app.patch("/myAddedTutors/:id", async (req, res) => {
