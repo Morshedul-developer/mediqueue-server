@@ -7,6 +7,7 @@ const port = process.env.PORT || 5000;
 
 dotenv.config();
 app.use(cors());
+app.use(express.json());
 
 const uri = process.env.MONGODB_URI;
 
@@ -28,6 +29,7 @@ async function run() {
 
     const db = client.db("mediqueue");
     const tutorsCollection = db.collection("tutorsCollection");
+    const myTutorsCollection = db.collection("myTutorCollection");
 
     app.get("/tutors", async (req, res) => {
       const cursor = tutorsCollection.find();
@@ -44,6 +46,12 @@ async function run() {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
       const result = await tutorsCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.post("/addMyTutor", async (req, res) => {
+      const myTutor = req.body;
+      const result = await myTutorsCollection.insertOne(myTutor);
       res.send(result);
     });
 
