@@ -49,6 +49,19 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/myAddedTutors", async (req, res) => {
+      const email = req.query.email;
+
+      const query = {
+        email: email,
+      };
+
+      const cursor = myTutorsCollection.find(query);
+      const result = await cursor.toArray();
+
+      res.send(result);
+    });
+
     app.post("/addMyTutor", async (req, res) => {
       const myTutor = req.body;
 
