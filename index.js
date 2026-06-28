@@ -51,7 +51,10 @@ async function run() {
 
     app.post("/addMyTutor", async (req, res) => {
       const myTutor = req.body;
-      const result = await myTutorsCollection.insertOne(myTutor);
+
+      await myTutorsCollection.insertOne(myTutor);
+      const result = await tutorsCollection.insertOne(myTutor);
+
       res.send(result);
     });
 
