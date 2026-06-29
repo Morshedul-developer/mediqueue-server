@@ -144,7 +144,7 @@ async function run() {
       res.send(bookingResult);
     });
 
-    app.patch("/myAddedTutors/:id", async (req, res) => {
+    app.patch("/myAddedTutors/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
       const updatedTutor = req.body;
 
@@ -186,7 +186,7 @@ async function run() {
       res.send(result);
     });
 
-    app.delete("/myAddedTutors/:id", async (req, res) => {
+    app.delete("/myAddedTutors/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
 
       const query = {
