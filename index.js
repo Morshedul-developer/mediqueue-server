@@ -2,6 +2,7 @@ const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const { createRemoteJWKSet, jwtVerify } = require("jose-cjs");
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -19,6 +20,25 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
+const JWKS = createRemoteJWKSet(new URL("http://localhost:3000/api/auth/jwks"));
+
+const verifyToken = async (req, res, next) => {
+  const authHeader = req?.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  try {
+    const { payload } = await jwtVerify(token, JWKS);
+    next();
+  } catch (error) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+};
 
 async function run() {
   try {
@@ -75,7 +95,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/myAddedTutors", async (req, res) => {
+    app.get("/myAddedTutors", verifyToken, async (req, res) => {
       const email = req.query.email;
 
       const query = {
@@ -98,7 +118,7 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/addMyTutor", async (req, res) => {
+    app.post("/addMyTutor", verifyToken, async (req, res) => {
       const myTutor = req.body;
 
       await myTutorsCollection.insertOne(myTutor);
