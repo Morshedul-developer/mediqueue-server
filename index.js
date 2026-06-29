@@ -33,8 +33,33 @@ async function run() {
     const bookedSessionsCollection = db.collection("bookedSessionsCollection");
 
     app.get("/tutors", async (req, res) => {
-      const cursor = tutorsCollection.find();
-      const result = await cursor.toArray();
+      const { search, startDate, endDate } = req.query;
+
+      let query = {};
+
+      // Search by tutor name
+      if (search) {
+        query.tutorName = {
+          $regex: search,
+          $options: "i",
+        };
+      }
+
+      // Filter by registration/session date
+      if (startDate || endDate) {
+        query.sessionStartDate = {};
+
+        if (startDate) {
+          query.sessionStartDate.$gte = startDate;
+        }
+
+        if (endDate) {
+          query.sessionStartDate.$lte = endDate;
+        }
+      }
+
+      const result = await tutorsCollection.find(query).toArray();
+
       res.send(result);
     });
     app.get("/available-tutors", async (req, res) => {
