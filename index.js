@@ -88,7 +88,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/tutors/:id", async (req, res) => {
+    app.get("/tutors/:id", verifyToken, async (req, res) => {
       const { id } = req.params;
       const query = { _id: new ObjectId(id) };
       const result = await tutorsCollection.findOne(query);
@@ -108,7 +108,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/myBookedSessions", async (req, res) => {
+    app.get("/myBookedSessions", verifyToken, async (req, res) => {
       const email = req.query.email;
 
       const result = await bookedSessionsCollection
@@ -127,7 +127,7 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/bookSession", async (req, res) => {
+    app.post("/bookSession", verifyToken, async (req, res) => {
       const booking = req.body;
 
       const bookingResult = await bookedSessionsCollection.insertOne(booking);
@@ -171,7 +171,7 @@ async function run() {
       res.send(myTutorResult);
     });
 
-    app.patch("/myBookedSessions/:id", async (req, res) => {
+    app.patch("/myBookedSessions/:id", verifyToken, async (req, res) => {
       const id = req.params.id;
 
       const result = await bookedSessionsCollection.updateOne(
